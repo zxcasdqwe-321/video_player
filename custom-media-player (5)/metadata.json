@@ -1,0 +1,6 @@
+{
+  "name": "Custom Media Player",
+  "description": "High-performance custom video player showing media discovery, permissions, and native decoding architecture.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

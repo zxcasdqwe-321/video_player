@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0A0B0C"
+    android:keepScreenOn="true">
+
+    <!-- Video Canvas box (fixed height of 240dp for perfect portrait ergonomics) -->
+    <FrameLayout
+        android:id="@+id/video_container"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:background="#000000">
+
+        <!-- OpenGL ES Canvas Surface for Simulation -->
+        <android.opengl.GLSurfaceView
+            android:id="@+id/gl_surface_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+
+        <!-- Real Video Surface View -->
+        <SurfaceView
+            android:id="@+id/real_surface_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <!-- Gesture swipe detection touch collector overlay -->
+        <View
+            android:id="@+id/gesture_touch_grabber"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <!-- Dynamic Gesture Banner (Brightness, Volume, seek ticks) -->
+        <LinearLayout
+            android:id="@+id/gesture_overlay_banner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:background="#99000000"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:visibility="gone"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/gesture_action_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:text="🔊" />
+
+            <TextView
+                android:id="@+id/gesture_overlay_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:text="50%" />
+        </LinearLayout>
+
+        <!-- Dynamic Subtitle Text placed over video bottom aspect -->
+        <TextView
+            android:id="@+id/txt_embedded_subtitles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="16dp"
+            android:background="#AA000000"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="5dp"
+            android:textColor="#FFEB3B"
+            android:textSize="14sp"
+            android:visibility="gone"
+            android:text="Subtitles text" />
+    </FrameLayout>
+
+    <!-- Top Playback bar with return back / quick controls -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:background="#131517"
+        android:padding="6dp">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:padding="8dp"
+            android:src="@android:drawable/ic_menu_revert"
+            android:contentDescription="Go back"
+            android:tint="#FFFFFF"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <TextView
+            android:id="@+id/txt_file_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/btn_back"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="8dp"
+            android:textColor="#E2E2E6"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Loading Video Title..." />
+    </RelativeLayout>
+
+    <!-- Scrollable Detail Info and Controller Card -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- HUD Control Box Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="#131517"
+                app:cardElevation="0dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Timeline Slider Block -->
+                    <SeekBar
+                        android:id="@+id/player_seekbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="1000"
+                        android:progress="0"
+                        android:progressTint="#3B82F6"
+                        android:thumbTint="#3B82F6" />
+
+                    <!-- Absolute Duration indicator details -->
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:id="@+id/txt_time_current"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:textColor="#EFEFEF"
+                            android:textSize="11sp"
+                            android:text="00:00" />
+
+                        <TextView
+                            android:id="@+id/txt_time_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:textColor="#999999"
+                            android:textSize="11sp"
+                            android:text="03:00" />
+                    </RelativeLayout>
+
+                    <!-- Playback Actions Panel Group -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:elevation="0dp">
+
+                        <!-- Rewind item -->
+                        <ImageView
+                            android:id="@+id/btn_rewind"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@android:drawable/ic_media_previous"
+                            android:contentDescription="Rewind 10s"
+                            android:layout_marginEnd="20dp"
+                            android:padding="8dp"
+                            android:tint="#CCCCCC"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <!-- Master Play/Pause toggle -->
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/btn_play_pause_card"
+                            android:layout_width="54dp"
+                            android:layout_height="54dp"
+                            app:cardCornerRadius="27dp"
+                            app:cardBackgroundColor="#2563EB"
+                            app:cardElevation="0dp"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <ImageView
+                                android:id="@+id/btn_play_pause"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:src="@android:drawable/ic_media_play"
+                                android:padding="14dp"
+                                android:tint="#FFFFFF" />
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- FastForward item -->
+                        <ImageView
+                            android:id="@+id/btn_fast_forward"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@android:drawable/ic_media_next"
+                            android:contentDescription="Fast Forward 15s"
+                            android:layout_marginStart="20dp"
+                            android:padding="8dp"
+                            android:tint="#CCCCCC"
+                            android:clickable="true"
+                            android:focusable="true"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Quick settings cards -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="14dp"
+                app:cardBackgroundColor="#131517"
+                app:cardElevation="0dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SETTINGS &amp; CONTROLS"
+                        android:textColor="#3B82F6"
+                        android:textStyle="bold"
+                        android:textSize="11sp"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#202224"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="12dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="4">
+
+                        <!-- Speed selector button -->
+                        <Button
+                            android:id="@+id/btn_speed"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="38dp"
+                            android:text="1.0x"
+                            android:textColor="#E2E2E6"
+                            android:textSize="11sp"
+                            android:backgroundTint="#202224"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:layout_marginEnd="4dp"/>
+
+                        <!-- Aspect Toggle button -->
+                        <Button
+                            android:id="@+id/btn_aspect"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="38dp"
+                            android:text="Aspect Fits"
+                            android:textColor="#E2E2E6"
+                            android:textSize="11sp"
+                            android:backgroundTint="#202224"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:layout_marginEnd="4dp"/>
+
+                        <!-- Subtitles Selector trigger -->
+                        <Button
+                            android:id="@+id/btn_subtitles"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="38dp"
+                            android:text="Subtitles"
+                            android:textColor="#E2E2E6"
+                            android:textSize="11sp"
+                            android:backgroundTint="#202224"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:layout_marginEnd="4dp"/>
+
+                        <!-- Audio Selector trigger -->
+                        <Button
+                            android:id="@+id/btn_audio"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="38dp"
+                            android:text="Audio"
+                            android:textColor="#E2E2E6"
+                            android:textSize="11sp"
+                            android:backgroundTint="#202224"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Video Context / Technical Information Box -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="14dp"
+                app:cardBackgroundColor="#131517"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MEDIA CONTAINER INFO"
+                        android:textColor="#888888"
+                        android:textStyle="bold"
+                        android:textSize="11sp"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#202224"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="12dp"/>
+
+                    <!-- Detailed parameters text fields -->
+                    <TextView
+                        android:id="@+id/info_resolution"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#BBBBBB"
+                        android:textSize="12sp"
+                        android:text="Resolution: 3840x2160"
+                        android:layout_marginBottom="6dp"/>
+
+                    <TextView
+                        android:id="@+id/info_size"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#BBBBBB"
+                        android:textSize="12sp"
+                        android:text="Size: 142 MB"
+                        android:layout_marginBottom="6dp"/>
+
+                    <TextView
+                        android:id="@+id/info_engine"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#60A5FA"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:text="Engine state: FFmpeg hardware acceleration active" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/player_root_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:keepScreenOn="true">
+
+    <!-- OpenGL ES Canvas Surface for Simulation -->
+    <android.opengl.GLSurfaceView
+        android:id="@+id/gl_surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center" />
+
+    <!-- Real Video Surface View for normal standard video files -->
+    <SurfaceView
+        android:id="@+id/real_surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <!-- Transparent Touch Gesture Grabber Interface Overlay -->
+    <View
+        android:id="@+id/gesture_touch_grabber"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"/>
+
+    <!-- Dynamic Overlay: Gestures Banner -->
+    <LinearLayout
+        android:id="@+id/gesture_overlay_banner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:background="#CC0F1113"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:visibility="gone"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/gesture_action_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:text="⏩" />
+
+        <TextView
+            android:id="@+id/gesture_overlay_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text="+01:25" />
+    </LinearLayout>
+
+    <!-- Subtitle text overlay over video aspect -->
+    <TextView
+        android:id="@+id/txt_embedded_subtitles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="88dp"
+        android:background="#B2000000"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:textColor="#FFEB3B"
+        android:textSize="16sp"
+        android:visibility="gone"
+        android:text="[Subtitles tracks active]" />
+
+    <!-- Interactive Bottom & Top HUD UI Controller Shell -->
+    <RelativeLayout
+        android:id="@+id/player_hud_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#33000000"
+        android:visibility="visible">
+
+        <!-- Top Controls Layout Bar (Semi-transparent black overlay) -->
+        <RelativeLayout
+            android:id="@+id/top_control_bar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_alignParentTop="true"
+            android:background="#CC131517"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/btn_back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:padding="8dp"
+                android:src="@android:drawable/ic_menu_revert"
+                android:tint="#FFFFFF"
+                android:contentDescription="Return Back" />
+
+            <TextView
+                android:id="@+id/txt_file_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/btn_back"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="14dp"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Custom_Native_H264_Stream.mkv" />
+
+            <!-- End buttons block -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_speed"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:backgroundTint="#2D3139"
+                    android:textColor="#E2E2E6"
+                    android:text="1.0x"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:id="@+id/btn_aspect"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:backgroundTint="#2D3139"
+                    android:textColor="#E2E2E6"
+                    android:text="Fit" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <!-- Bottom Controller Panel (Semi-transparent black backdrop) -->
+        <LinearLayout
+            android:id="@+id/bottom_control_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="#EA131517"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Scrubbing Timeline Slider -->
+            <SeekBar
+                android:id="@+id/player_seekbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="1000"
+                android:progress="0"
+                android:progressTint="#3B82F6"
+                android:thumbTint="#3B82F6" />
+
+            <!-- Subtitle and Controls Row -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp">
+
+                <!-- Current & Absolute Time Labels -->
+                <TextView
+                    android:id="@+id/txt_time_current"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:textColor="#EFEFEF"
+                    android:textSize="12sp"
+                    android:text="00:00" />
+
+                <TextView
+                    android:id="@+id/txt_duration_sep"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/txt_time_current"
+                    android:layout_centerVertical="true"
+                    android:textColor="#666666"
+                    android:textSize="12sp"
+                    android:text=" / " />
+
+                <TextView
+                    android:id="@+id/txt_time_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/txt_duration_sep"
+                    android:layout_centerVertical="true"
+                    android:textColor="#999999"
+                    android:textSize="12sp"
+                    android:text="03:00" />
+
+                <!-- Control Buttons Group in Center -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:id="@+id/btn_rewind"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/ic_media_previous"
+                        android:padding="8dp"
+                        android:tint="#CCCCCC"
+                        android:layout_marginEnd="16dp"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <!-- Play/Pause Button Toggle inside active circle -->
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/btn_play_pause_card"
+                        android:layout_width="46dp"
+                        android:layout_height="46dp"
+                        app:cardCornerRadius="23dp"
+                        app:cardBackgroundColor="#2563EB"
+                        app:cardElevation="0dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:id="@+id/btn_play_pause"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@android:drawable/ic_media_play"
+                            android:padding="12dp"
+                            android:tint="#FFFFFF" />
+                    </androidx.cardview.widget.CardView>
+
+                    <ImageView
+                        android:id="@+id/btn_fast_forward"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/ic_media_next"
+                        android:padding="8dp"
+                        android:tint="#CCCCCC"
+                        android:layout_marginStart="16dp"
+                        android:clickable="true"
+                        android:focusable="true"/>
+                </LinearLayout>
+
+                <!-- Subtitle and Audio Switcher at end corner -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_subtitles"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:backgroundTint="#2D3139"
+                        android:textColor="#E2E2E6"
+                        android:text="Subtitles"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/btn_audio"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:backgroundTint="#2D3139"
+                        android:textColor="#E2E2E6"
+                        android:text="Audio" />
+                </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
+    </RelativeLayout>
+</FrameLayout>
